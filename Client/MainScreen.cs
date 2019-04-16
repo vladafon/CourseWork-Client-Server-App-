@@ -14,12 +14,12 @@ namespace Client
 {
     public partial class MainScreen : Form
     {
+        private string selectedPath;
+
         public MainScreen()
         {
+            selectedPath = "";
             InitializeComponent();
-
-            treeView1.BeforeSelect += treeView1_BeforeSelect;
-            treeView1.BeforeExpand += treeView1_BeforeExpand;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -30,37 +30,101 @@ namespace Client
 
         private void sendRequest_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void treeView1_BeforeExpand(object sender, TreeViewCancelEventArgs e)
-        {
-
-        }
-
-        private void treeView1_BeforeSelect(object sender, TreeViewCancelEventArgs e)
-        {
-            TreeNode rootNode = e.Node.Parent;
-            string filePath = "/";
-            while (rootNode != null)
-            {
-                filePath += rootNode.Parent.Name;
-                rootNode = rootNode.Parent;
-            }
-
-            dirPath.Text = filePath;
-        }
-
-        private string GetResponse(string name, string path)
-        {
-            string url = "http://localhost/Server/" + name+ ".php";
+            //get response
+            string url = "http://localhost/stringFinder/findString.php";
             using (var webClient = new WebClient())
             {
-                var pars = new NameValueCollection {{name, path}};
+                var pars = new NameValueCollection { { "path", dirPath.Text }, {"string",subString.Text} };
                 var response = webClient.UploadValues(url, pars);
-                return Encoding.UTF8.GetString(response);
+                string result = Encoding.UTF8.GetString(response);
+                if (result.Contains("Warning"))
+                {
+                    resultBox.Clear();
+                    return;
+                }
 
+                resultBox.Text = result.Replace("<br>","\n").Replace(";",",");
             }
+        }
+
+
+        private void getDirs_Click(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedIndex == -1)
+                return;
+            selectedPath += listBox1.Items[listBox1.SelectedIndex];
+            if (selectedPath != "/")
+                selectedPath += "/";
+
+            //get response
+            string url = "http://localhost/stringFinder/getDirs.php";
+            using (var webClient = new WebClient())
+            {
+                var pars = new NameValueCollection {{"directory", selectedPath}};
+                var response = webClient.UploadValues(url, pars);
+                string result = Encoding.UTF8.GetString(response);
+                if (result.Contains("Warning"))
+                {
+                    listBox1.Items.Clear();
+                    return;
+                }
+
+                string[] items = result.Split(';');
+                listBox1.Items.Clear();
+                foreach (var item in items)
+                {
+                    if (item != "" && item != "." && item != "..")
+                        listBox1.Items.Add(item);
+                }
+            }
+        }
+
+        private void backButton_Click(object sender, EventArgs e)
+        {
+            if (selectedPath == "/")
+                return;
+
+            string[] splittedPath = selectedPath.Split('/');
+
+            selectedPath = "/";
+            for (int i=0; i<splittedPath.Length-2;i++)
+            { 
+                if (splittedPath[i] != "")
+                    selectedPath += splittedPath[i]+"/";
+            }
+
+
+            //get response
+            string url = "http://localhost/stringFinder/getDirs.php";
+            using (var webClient = new WebClient())
+            {
+                var pars = new NameValueCollection {{"directory", selectedPath}};
+                var response = webClient.UploadValues(url, pars);
+                string result = Encoding.UTF8.GetString(response);
+                if (result.Contains("Warning"))
+                {
+                    listBox1.Items.Clear();
+                    return;
+                }
+
+                string[] items = result.Split(';');
+                listBox1.Items.Clear();
+                foreach (var item in items)
+                {
+                    if (item != "" && item != "." && item != "..")
+                        listBox1.Items.Add(item);
+                }
+            }
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedIndex == -1)
+                return;
+            dirPath.Text = selectedPath + listBox1.Items[listBox1.SelectedIndex];
+            if (dirPath.Text != @"/")
+                dirPath.Text += @"/";
+
         }
     }
 }

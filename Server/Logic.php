@@ -10,7 +10,7 @@
  */
 class Logic
 {
-    public function substring_finder($sub_str, $str)
+    private function substring_finder($sub_str, $str)
     {
         $prefix_string = $sub_str."@".$str;
         $prefix_array = $this->compute_prefix_function($prefix_string);
@@ -48,16 +48,18 @@ class Logic
 
     public function find_strings_in_files_in_directory($path, $string_to_find)
     {
+
         $content = explode(";", $this ->get_directories($path));
+
 
         $result = array();
 
         foreach ($content as $item)
         {
             if (strpos($item,".txt") !== false)
-                $result[$item] = $this ->find_string_in_file($path . "\\" . $item, $string_to_find);
-            else if (strpos($item,".") === false)
-                $this -> find_strings_in_files_in_directory($path . "\\" . $item, $string_to_find);
+                $result[$path . $item] = $this ->find_string_in_file($path . $item, $string_to_find);
+            else if (strpos($item,".") === false && $item != "")
+                $result = array_merge($result, $this -> find_strings_in_files_in_directory($path . $item . "/", $string_to_find));
         }
         return $result;
     }
@@ -66,14 +68,14 @@ class Logic
     {
         $rows = "";
 
-        $file = fopen($path,r);
+        $file = fopen($path, "r");
 
         $row = 1;
         while(!feof($file))
         {
             $str = fgets($file);
             if ($this ->substring_finder($string_to_find, $str))
-                $rows += $row.";";
+                $rows .= $row.";";
             $row++;
         }
 
@@ -83,12 +85,19 @@ class Logic
 
     public function get_directories ($path)
     {
-        $dirsarray = scandir($path);
+        try
+        {
+            $dirsarray = scandir($path);
+        }
+        catch (Exception $e)
+        {
+            return "Error";
+        }
 
         $dirsstring = "";
         foreach ($dirsarray as $item)
         {
-            $dirsstring += $item.";";
+            $dirsstring .= $item.";";
         }
 
         return $dirsstring;
