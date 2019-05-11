@@ -1,5 +1,5 @@
 <?php
-
+ini_set('max_execution_time', 900);
 /**
  * Logic short summary.
  *
@@ -10,6 +10,7 @@
  */
 class Logic
 {
+
     private function substring_finder($sub_str, $str)
     {
         $prefix_string = $sub_str."@".$str;
@@ -19,7 +20,11 @@ class Logic
         foreach($prefix_array as $item)
         {
             if ($item == mb_strlen($sub_str))
+            {
                 $isfind = true;
+                break;
+            }
+
         }
 
         return $isfind;
@@ -51,14 +56,15 @@ class Logic
 
         $content = explode(";", $this ->get_directories($path));
 
-
+       // && strpos($item,".") === false
         $result = array();
 
         foreach ($content as $item)
         {
-            if (strpos($item,".txt") !== false)
+            //TODO add more file types, str after str exit
+            if (strpos($item,".txt") !== false || strpos($item,".TXT") !== false)
                 $result[$path . $item] = $this ->find_string_in_file($path . $item, $string_to_find);
-            else if (strpos($item,".") === false && $item != "")
+            else if ($item != "")
                 $result = array_merge($result, $this -> find_strings_in_files_in_directory($path . $item . "/", $string_to_find));
         }
         return $result;
@@ -85,18 +91,18 @@ class Logic
 
     public function get_directories ($path)
     {
-        try
-        {
-            $dirsarray = scandir($path);
-        }
-        catch (Exception $e)
-        {
-            return "Error";
-        }
+        if (file_exists($path) && is_dir($path) && is_readable($path))
+                $dirsarray = scandir($path);
+            else
+                return "";
+
 
         $dirsstring = "";
         foreach ($dirsarray as $item)
         {
+            if ($item == "." || $item == "..")
+                continue;
+
             $dirsstring .= $item.";";
         }
 

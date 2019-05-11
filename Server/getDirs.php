@@ -10,10 +10,10 @@ if (isset($_POST["directory"]) && preg_match("/(\/){1}(([^\/]+)(\/{1}))*$/", $_P
     }
     catch (Exception $e)
     {
-        echo "Error";
+        echo "500 Internal Server Error";
     }
 }
 else
-    echo "Error";
+    echo "400 Bad Request";
 
 ?>
