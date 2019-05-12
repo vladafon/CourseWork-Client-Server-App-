@@ -34,7 +34,6 @@ class Logic
     {
     $prefix_array = array(); // значения префикс-функции
     $prefix_array[0] = 0;
-    $k = 0;
     $j = 0;
     $i = 1;
     while ($i<mb_strlen($str))

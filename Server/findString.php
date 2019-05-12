@@ -2,7 +2,7 @@
 include("Logic.php");
 $l = new Logic();
 
-if (isset($_POST["string"]) && isset($_POST["path"]) && preg_match("/(\/){1}(([^\/]+)(\/{1}))*$/", $_POST["path"]))
+if (isset($_POST["string"]) && isset($_POST["path"]) && preg_match("/^(\/){1}(([^\/]+)(\/{1}))*$/", $_POST["path"]))
 {
 
     $result = $l ->find_strings_in_files_in_directory($_POST["path"],$_POST["string"]);
@@ -23,7 +23,8 @@ if (isset($_POST["string"]) && isset($_POST["path"]) && preg_match("/(\/){1}(([^
 }
 else
 {
-    echo "400 Bad request";
+    echo "400 Bad Request";
+    http_response_code(400);
 }
 
 ?>

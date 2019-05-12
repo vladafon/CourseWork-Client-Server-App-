@@ -7,7 +7,7 @@
 
 //echo "";
 ?>
-<h2> Форма для регистрации студентов</h2>
+<h2> Форма для поиска</h2>
 <form action="findString.php" method=POST>
    
     Path
