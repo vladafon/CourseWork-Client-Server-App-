@@ -33,20 +33,25 @@ class Logic
     private function compute_prefix_function($str)
     {
     $prefix_array = array(); // значения префикс-функции
-                                 // индекс листа соответствует номеру последнего символа аргумента
+    $prefix_array[0] = 0;
     $k = 0;
-    for ($i = 1; $i < mb_strlen($str); ++$i) {
-        while (($k > 0) && ($str[$k] != $str[$i]))
+    $j = 0;
+    $i = 1;
+    while ($i<mb_strlen($str))
+    {
+        if ($str[$i] == $str[$j])
         {
-            if ($k-1 <= 0 || $k-1 > count($prefix_array))
-                $k = 0;
-            else
-                $k = $prefix_array[$k-1];
-
+            $prefix_array[$i]=$j+1;
+            $i++;
+            $j++;
         }
-        if ($str[$k] == $str[$i])
-            ++$k;
-        $prefix_array[$i] = $k;
+        else if ($j == 0)
+        {
+            $prefix_array[$i] =0;
+            $i++;
+        }
+        else
+            $j=$prefix_array[$j-1];
     }
     return $prefix_array;
 }
