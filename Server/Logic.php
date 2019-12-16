@@ -32,7 +32,7 @@ class Logic
 
     private function compute_prefix_function($str)
     {
-    $prefix_array = array(); // çíà÷åíèÿ ïðåôèêñ-ôóíêöèè
+    $prefix_array = array(); // Ã§Ã­Ã Ã·Ã¥Ã­Ã¨Ã¿ Ã¯Ã°Ã¥Ã´Ã¨ÃªÃ±-Ã´Ã³Ã­ÃªÃ¶Ã¨Ã¨
     $prefix_array[0] = 0;
     $j = 0;
     $i = 1;
@@ -67,7 +67,7 @@ class Logic
         {
             //TODO add more file types, str after str exit
             if (strpos($item,".txt") !== false || strpos($item,".TXT") !== false)
-                $result[$path . $item] = $this ->find_string_in_file($path . $item, $string_to_find);
+                $result[$path ."/". $item] = $this ->find_string_in_file($path ."/". $item, $string_to_find);
             else if ($item != "")
                 $result = array_merge($result, $this -> find_strings_in_files_in_directory($path . $item . "/", $string_to_find));
         }
